@@ -1,4 +1,4 @@
-const CACHE_NAME = 'secondsense-v1';
+const CACHE_NAME = 'secondsense-v2';
 const ASSETS = [
   '/',
   '/index.html',
