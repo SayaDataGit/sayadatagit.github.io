@@ -1,8 +1,9 @@
 {
+  "id": "/secondsense-tap/",
   "name": "SecondSense Tap",
   "short_name": "SecondSense",
   "description": "Train Your Mind — Master the art of mental counting",
-  "start_url": "/secondsense-tap/",
+  "start_url": "/secondsense-tap/index.html",
   "scope": "/secondsense-tap/",
   "display": "standalone",
   "orientation": "portrait",
