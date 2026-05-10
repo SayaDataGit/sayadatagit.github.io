@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<title>SecondSense Tap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#04040f; --surface:#0e0e28;
+    --accent:#00f5ff; --accent2:#7b2fff; --accent3:#ff2d78;
+    --text:#e8e8ff; --text-dim:#7070aa;
+    --success:#00ffaa; --warning:#ffcc00; --danger:#ff2d78;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;height:100dvh;overflow:hidden;position:relative;}
+
+  .bg-grid{position:fixed;inset:0;z-index:0;background-image:linear-gradient(rgba(0,245,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,245,255,0.03) 1px,transparent 1px);background-size:40px 40px;animation:gridMove 20s linear infinite;}
+  @keyframes gridMove{100%{background-position:40px 40px}}
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);z-index:0;pointer-events:none;}
+  .orb1{width:300px;height:300px;background:rgba(0,245,255,0.06);top:-100px;right:-100px;animation:orbFloat 8s ease-in-out infinite;}
+  .orb2{width:250px;height:250px;background:rgba(123,47,255,0.08);bottom:-80px;left:-80px;animation:orbFloat 10s ease-in-out infinite reverse;}
+  @keyframes orbFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-20px)}}
+
+  .screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px;transition:opacity 0.3s ease,transform 0.3s ease;overflow-y:auto;}
+  .screen::-webkit-scrollbar{display:none;}
+  .screen.hidden{opacity:0;pointer-events:none;transform:scale(0.97);}
+  .screen-centered{justify-content:center;}
+
+  /* SPLASH */
+  #splash{background:radial-gradient(ellipse at 50% 40%,#0a0a2e 0%,#04040f 70%);gap:14px;padding-top:48px;}
+  .splash-logo{font-family:'Orbitron',monospace;font-size:clamp(26px,8vw,40px);font-weight:900;letter-spacing:2px;line-height:1.1;text-align:center;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:logoGlow 3s ease-in-out infinite;}
+  @keyframes logoGlow{0%,100%{filter:drop-shadow(0 0 8px rgba(0,245,255,0.5))}50%{filter:drop-shadow(0 0 20px rgba(0,245,255,0.9))}}
+  .splash-tag{font-size:12px;font-weight:500;letter-spacing:6px;color:var(--text-dim);text-transform:uppercase;}
+  .splash-ring{width:130px;height:130px;border-radius:50%;border:2px solid rgba(0,245,255,0.2);display:flex;align-items:center;justify-content:center;position:relative;animation:ringRotate 8s linear infinite;}
+  @keyframes ringRotate{100%{transform:rotate(360deg)}}
+  .splash-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid transparent;border-top-color:var(--accent);animation:ringRotate 3s linear infinite;}
+  .splash-ring::after{content:'';position:absolute;inset:8px;border-radius:50%;border:1px solid transparent;border-bottom-color:var(--accent2);animation:ringRotate 5s linear infinite reverse;}
+  .brain-icon{font-size:48px;position:relative;z-index:1;}
+  .splash-desc{font-size:14px;color:var(--text-dim);text-align:center;max-width:270px;line-height:1.6;}
+  .stats-preview{display:flex;gap:24px;}
+  .stat-item{text-align:center;}
+  .stat-val{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--accent);}
+  .stat-lbl{font-size:11px;color:var(--text-dim);letter-spacing:2px;text-transform:uppercase;}
+  .splash-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px;}
+
+  /* BUTTONS */
+  .btn-start{padding:16px 40px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;border-radius:50px;color:#fff;font-family:'Orbitron',monospace;font-size:15px;font-weight:700;letter-spacing:2px;cursor:pointer;animation:btnPulse 2s ease-in-out infinite;transition:transform 0.1s;width:100%;}
+  .btn-start:active{transform:scale(0.96);}
+  @keyframes btnPulse{0%,100%{box-shadow:0 0 30px rgba(0,245,255,0.3),0 0 60px rgba(123,47,255,0.2)}50%{box-shadow:0 0 50px rgba(0,245,255,0.6),0 0 100px rgba(123,47,255,0.4)}}
+  .btn-outline{padding:13px 40px;background:transparent;border:1px solid rgba(0,245,255,0.25);border-radius:50px;color:var(--accent);font-family:'Orbitron',monospace;font-size:13px;font-weight:600;letter-spacing:2px;cursor:pointer;transition:all 0.2s;width:100%;}
+  .btn-outline:active{background:rgba(0,245,255,0.08);}
+  .btn-primary{padding:16px;background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;border-radius:14px;color:#fff;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;transition:all 0.2s;width:100%;}
+  .btn-primary:active{transform:scale(0.97);opacity:0.9;}
+  .btn-secondary{padding:14px;background:transparent;border:1px solid rgba(0,245,255,0.2);border-radius:14px;color:var(--accent);font-family:'Orbitron',monospace;font-size:13px;font-weight:600;letter-spacing:2px;cursor:pointer;transition:all 0.2s;width:100%;}
+  .btn-secondary:active{background:rgba(0,245,255,0.08);}
+  .btn-green{padding:16px;background:linear-gradient(135deg,#1d8a4e,#0fa36a);border:none;border-radius:14px;color:#fff;font-family:'Orbitron',monospace;font-size:14px;font-weight:700;letter-spacing:2px;cursor:pointer;width:100%;transition:all 0.2s;}
+  .btn-green:active{transform:scale(0.97);}
+
+  /* SCREEN HEADER */
+  .screen-header{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:380px;margin-bottom:16px;padding-top:20px;}
+  .screen-title{font-family:'Orbitron',monospace;font-size:17px;font-weight:700;letter-spacing:3px;color:var(--accent);}
+  .btn-home{width:42px;height:42px;border-radius:12px;background:var(--surface);border:1px solid rgba(0,245,255,0.15);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all 0.2s;flex-shrink:0;}
+  .btn-home:active{background:rgba(0,245,255,0.1);}
+
+  /* STATS */
+  #stats{background:radial-gradient(ellipse at 50% 30%,#0a0020 0%,#04040f 70%);gap:0;}
+  .stats-inner{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px;align-items:center;}
+  .stats-no-data{color:var(--text-dim);font-size:15px;text-align:center;margin-top:30px;line-height:1.8;}
+
+  /* LEVEL SELECT */
+  #levelSelect{gap:0;}
+  .levels-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:380px;}
+  .level-card{background:var(--surface);border:1px solid rgba(0,245,255,0.1);border-radius:16px;padding:16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;}
+  .level-card.locked{opacity:0.4;cursor:not-allowed;pointer-events:none;}
+  .level-card:not(.locked):active{transform:scale(0.97);}
+  .level-card.completed{border-color:rgba(0,255,170,0.35);}
+  .level-card.current{border-color:var(--accent);box-shadow:0 0 20px rgba(0,245,255,0.2);}
+  .level-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent2),var(--accent));opacity:0;transition:opacity 0.2s;}
+  .level-card.current::before,.level-card.completed::before{opacity:1;}
+  .level-num{font-family:'Orbitron',monospace;font-size:11px;font-weight:600;letter-spacing:3px;color:var(--text-dim);}
+  .level-target{font-family:'Orbitron',monospace;font-size:28px;font-weight:800;color:var(--text);line-height:1;margin:4px 0;}
+  .level-info{font-size:12px;color:var(--text-dim);}
+  .level-score{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--success);margin-top:6px;}
+  .lock-icon{font-size:18px;position:absolute;top:12px;right:12px;}
+  .check-icon{font-size:14px;position:absolute;top:12px;right:12px;color:var(--success);font-weight:700;}
+  .level-progress{height:3px;background:rgba(0,245,255,0.1);border-radius:2px;margin-top:8px;overflow:hidden;}
+  .level-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:2px;}
+
+  /* PRE GAME */
+  #pregame{background:radial-gradient(ellipse at 50% 50%,#0a0028 0%,#04040f 70%);gap:18px;justify-content:center;}
+  .tension-label{font-family:'Orbitron',monospace;font-size:12px;font-weight:600;letter-spacing:6px;color:var(--accent2);text-transform:uppercase;animation:tensionFlash 1s ease-in-out infinite;}
+  @keyframes tensionFlash{0%,100%{opacity:1}50%{opacity:0.4}}
+  .tension-title{font-family:'Orbitron',monospace;font-size:clamp(28px,9vw,46px);font-weight:900;text-align:center;line-height:1;}
+  .tension-title span{color:var(--accent);}
+  .tension-box{background:rgba(0,245,255,0.04);border:1px solid rgba(0,245,255,0.15);border-radius:16px;padding:18px 28px;text-align:center;width:100%;max-width:320px;}
+  .tension-count{font-family:'Orbitron',monospace;font-size:44px;font-weight:900;color:var(--accent);line-height:1;}
+  .tension-desc{font-size:14px;color:var(--text-dim);margin-top:4px;letter-spacing:1px;}
+  .tension-warning{font-size:15px;color:var(--warning);text-align:center;font-weight:600;letter-spacing:1px;max-width:300px;}
+  .tension-warning.invisible{color:var(--accent3);}
+  .countdown-start{font-family:'Orbitron',monospace;font-size:80px;font-weight:900;color:var(--accent);text-shadow:0 0 40px rgba(0,245,255,0.8);animation:countAnim 0.7s ease-in-out;}
+  @keyframes countAnim{0%{transform:scale(1.5);opacity:0}50%{transform:scale(1);opacity:1}100%{transform:scale(0.9);opacity:0.8}}
+
+  /* GAME */
+  #game{background:#04040f;justify-content:space-between;padding:40px 24px 0;gap:0;}
+  .game-header{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:380px;}
+  .game-level-badge{font-family:'Orbitron',monospace;font-size:12px;font-weight:600;letter-spacing:3px;color:var(--text-dim);background:var(--surface);padding:6px 14px;border-radius:20px;border:1px solid rgba(0,245,255,0.1);}
+  .game-target-badge{font-family:'Orbitron',monospace;font-size:12px;font-weight:600;color:var(--accent2);background:rgba(123,47,255,0.1);border:1px solid rgba(123,47,255,0.2);padding:6px 14px;border-radius:20px;}
+  .counter-area{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+  .counter-ring{width:180px;height:180px;border-radius:50%;border:3px solid rgba(0,245,255,0.15);display:flex;align-items:center;justify-content:center;position:relative;transition:all 0.3s;}
+  .counter-ring.visible{border-color:rgba(0,245,255,0.4);box-shadow:0 0 40px rgba(0,245,255,0.2);}
+  .counter-ring.hidden-count{border-color:rgba(123,47,255,0.3);box-shadow:0 0 40px rgba(123,47,255,0.15);}
+  .counter-number{font-family:'Orbitron',monospace;font-size:72px;font-weight:900;color:var(--accent);text-shadow:0 0 30px rgba(0,245,255,0.6);line-height:1;transition:opacity 0.3s;}
+  .counter-number.tick{animation:tick 0.1s ease-out;}
+  @keyframes tick{0%{transform:scale(1.2)}100%{transform:scale(1)}}
+  .mental-msg{text-align:center;padding:0 20px;}
+  .mental-msg .big{font-family:'Orbitron',monospace;font-size:clamp(15px,4.5vw,20px);font-weight:700;color:var(--text);line-height:1.3;}
+  .mental-msg .sub{font-size:14px;color:var(--text-dim);margin-top:6px;letter-spacing:1px;}
+  .tap-zone{width:100%;flex:0 0 50%;display:flex;align-items:stretch;}
+  .tap-btn{width:100%;background:linear-gradient(180deg,rgba(0,245,255,0.06) 0%,rgba(0,245,255,0.12) 100%);border:2px solid rgba(0,245,255,0.2);border-radius:40px 40px 0 0;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:background 0.1s,border-color 0.1s;gap:8px;position:relative;overflow:hidden;-webkit-user-select:none;user-select:none;}
+  .tap-btn.disabled{opacity:0.3;pointer-events:none;}
+  .tap-btn:not(.disabled):active{background:rgba(0,245,255,0.18);border-color:var(--accent);}
+  .tap-icon{font-size:48px;pointer-events:none;}
+  .tap-text{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;letter-spacing:3px;color:var(--accent);pointer-events:none;}
+  .tap-hint{font-size:13px;color:var(--text-dim);letter-spacing:1px;pointer-events:none;}
+  .ripple{position:absolute;border-radius:50%;background:rgba(0,245,255,0.3);animation:rippleAnim 0.6s ease-out forwards;pointer-events:none;}
+  @keyframes rippleAnim{0%{transform:scale(0);opacity:1}100%{transform:scale(4);opacity:0}}
+
+  /* RESULT */
+  #result{background:radial-gradient(ellipse at 50% 30%,#0a0020 0%,#04040f 70%);gap:14px;padding-top:50px;}
+  .result-header{text-align:center;}
+  .result-emoji{font-size:50px;display:block;margin-bottom:6px;}
+  .result-title{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;}
+  .result-subtitle{font-size:14px;color:var(--text-dim);margin-top:4px;}
+  .score-display{text-align:center;background:var(--surface);border:1px solid rgba(0,245,255,0.15);border-radius:20px;padding:18px 32px;width:100%;max-width:320px;}
+  .score-pts{font-family:'Orbitron',monospace;font-size:56px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .score-label{font-size:12px;color:var(--text-dim);letter-spacing:3px;text-transform:uppercase;}
+  .score-deviation{font-size:14px;color:var(--text-dim);margin-top:8px;}
+  .score-deviation span{color:var(--warning);font-weight:600;}
+  .result-verdict{text-align:center;font-size:16px;color:var(--text);max-width:300px;line-height:1.5;}
+  .result-verdict .highlight{font-family:'Orbitron',monospace;font-size:22px;color:var(--accent);display:block;margin-top:4px;}
+  .pass-fail{padding:10px 28px;border-radius:30px;font-family:'Orbitron',monospace;font-size:13px;font-weight:700;letter-spacing:2px;text-align:center;}
+  .pass-fail.pass{background:rgba(0,255,170,0.1);color:var(--success);border:1px solid rgba(0,255,170,0.3);}
+  .pass-fail.fail{background:rgba(255,45,120,0.1);color:var(--danger);border:1px solid rgba(255,45,120,0.3);}
+  .result-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:320px;}
+
+  /* FINAL */
+  #finalResult{background:radial-gradient(ellipse at 50% 20%,#0a0030 0%,#04040f 70%);gap:14px;padding-top:40px;}
+  .final-title{font-family:'Orbitron',monospace;font-size:clamp(18px,5.5vw,26px);font-weight:900;text-align:center;background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .trophy{font-size:60px;display:block;text-align:center;animation:trophySpin 0.6s ease-out;}
+  @keyframes trophySpin{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0)}}
+  .final-score-big{text-align:center;background:var(--surface);border:1px solid rgba(0,245,255,0.2);border-radius:20px;padding:18px;width:100%;max-width:340px;}
+  .final-pts{font-family:'Orbitron',monospace;font-size:52px;font-weight:900;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  .final-pts-label{font-size:12px;color:var(--text-dim);letter-spacing:3px;margin-top:4px;}
+  .final-avg{font-size:14px;color:var(--text-dim);margin-top:8px;}
+  .final-avg span{color:var(--accent2);font-weight:600;}
+  .percentile-box{background:linear-gradient(135deg,rgba(0,245,255,0.08),rgba(123,47,255,0.08));border:1px solid rgba(0,245,255,0.2);border-radius:20px;padding:18px;text-align:center;width:100%;max-width:340px;}
+  .percentile-label{font-size:12px;color:var(--text-dim);letter-spacing:2px;margin-bottom:6px;}
+  .percentile-val{font-family:'Orbitron',monospace;font-size:34px;font-weight:900;color:var(--accent3);text-shadow:0 0 20px rgba(255,45,120,0.5);}
+  .percentile-text{font-size:14px;color:var(--text);margin-top:4px;}
+  .breakdown{width:100%;max-width:340px;}
+  .breakdown-title{font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:var(--text-dim);text-transform:uppercase;margin-bottom:10px;}
+  .breakdown-row .lv{font-family:'Orbitron',monospace;font-size:12px;color:var(--text-dim);}
+  .breakdown-row .sc{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;}
+  .sc.great{color:var(--success);}.sc.ok{color:var(--warning);}.sc.poor{color:var(--danger);}
+  .breakdown-row .dev{font-size:12px;color:var(--text-dim);}
+  .final-btns{display:flex;gap:10px;width:100%;max-width:340px;}
+  .final-btns .btn-primary,.final-btns .btn-secondary{flex:1;}
+
+  /* USERNAME */
+  .username-box{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid rgba(0,245,255,0.15);border-radius:14px;padding:10px 16px;width:100%;max-width:300px;transition:border-color 0.2s;}
+  .username-box:focus-within{border-color:rgba(0,245,255,0.4);}
+  .country-btn{display:flex;align-items:center;gap:5px;background:rgba(0,245,255,0.06);border:1px solid rgba(0,245,255,0.15);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:18px;line-height:1;white-space:nowrap;flex-shrink:0;transition:background 0.2s;}
+  .country-btn:active{background:rgba(0,245,255,0.15);}
+  .country-btn-flag{font-size:18px;}
+  .country-divider{width:1px;height:20px;background:rgba(0,245,255,0.1);flex-shrink:0;}
+  .username-display{flex:1;font-family:'Orbitron',monospace;font-size:13px;font-weight:600;color:var(--text);letter-spacing:1px;cursor:pointer;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .username-display.placeholder{color:var(--text-dim);font-weight:400;font-family:'Rajdhani',sans-serif;letter-spacing:0;}
+  .username-input{flex:1;background:transparent;border:none;outline:none;font-family:'Orbitron',monospace;font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1px;width:100%;min-width:0;}
+  .username-edit-btn{font-size:15px;cursor:pointer;opacity:0.6;transition:opacity 0.2s;background:none;border:none;padding:0;line-height:1;flex-shrink:0;}
+  .username-edit-btn:active{opacity:1;}
+
+  /* COUNTRY MODAL */
+  .country-modal{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;background:#04040f;transition:opacity 0.25s;}
+  .country-modal.hidden{display:none;}
+  .country-modal-header{display:flex;align-items:center;justify-content:space-between;padding:20px 20px 12px;border-bottom:1px solid rgba(0,245,255,0.1);}
+  .country-modal-title{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;letter-spacing:3px;color:var(--accent);}
+  .country-modal-close{width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid rgba(0,245,255,0.15);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+  .country-search-wrap{padding:12px 16px;border-bottom:1px solid rgba(0,245,255,0.08);}
+  .country-search{width:100%;background:var(--surface);border:1px solid rgba(0,245,255,0.2);border-radius:12px;padding:12px 16px;color:var(--text);font-family:'Rajdhani',sans-serif;font-size:16px;outline:none;}
+  .country-search::placeholder{color:var(--text-dim);}
+  .country-search:focus{border-color:rgba(0,245,255,0.5);}
+  .country-list{flex:1;overflow-y:auto;padding:8px 0;}
+  .country-list::-webkit-scrollbar{display:none;}
+  .country-item{display:flex;align-items:center;gap:14px;padding:13px 20px;cursor:pointer;transition:background 0.15s;}
+  .country-item:active{background:rgba(0,245,255,0.08);}
+  .country-item.selected{background:rgba(0,245,255,0.06);border-left:3px solid var(--accent);}
+  .country-item-flag{font-size:24px;line-height:1;width:30px;text-align:center;}
+  .country-item-name{font-size:16px;color:var(--text);font-weight:500;}
+
+  .breakdown-scroll{max-height:calc(5 * 47px);overflow-y:auto;overflow-x:hidden;}
+  .breakdown-scroll::-webkit-scrollbar{width:3px;}
+  .breakdown-scroll::-webkit-scrollbar-track{background:transparent;}
+  .breakdown-scroll::-webkit-scrollbar-thumb{background:rgba(0,245,255,0.2);border-radius:2px;}
+  .breakdown-row{display:flex;justify-content:space-between;align-items:center;padding:8px 14px;background:var(--surface);border-radius:10px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.04);height:41px;box-sizing:border-box;}
+  .ranking-pos{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--text-dim);width:22px;flex-shrink:0;}
+  .ranking-pos.gold{color:#ffd700;}
+  .ranking-pos.silver{color:#c0c0c0;}
+  .ranking-pos.bronze{color:#cd7f32;}
+  .ranking-flag{font-size:18px;flex-shrink:0;line-height:1;}
+  .ranking-name{flex:1;font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 6px;}
+  .ranking-me{color:var(--accent);}
+  .ranking-pts{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--success);flex-shrink:0;}
+  .ranking-date{font-size:10px;color:var(--text-dim);flex-shrink:0;margin-left:6px;}
+
+  /* HIDDEN SKILL */
+  #hiddenSkill{background:radial-gradient(ellipse at 50% 20%,#080820 0%,#04040f 70%);gap:0;justify-content:flex-start;padding-top:0;}
+  .hs-inner{width:100%;max-width:360px;padding-bottom:24px;}
+  .hs-divider{height:1px;background:linear-gradient(90deg,transparent,rgba(0,245,255,0.25),transparent);margin:20px 0;}
+  .hs-intro{font-size:16px;line-height:1.75;color:var(--text-dim);font-style:italic;text-align:center;padding:0 8px;}
+  .hs-intro strong{color:var(--text);font-style:normal;}
+  .hs-quote{font-family:'Orbitron',monospace;font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1px;text-align:center;margin-bottom:16px;}
+  .hs-section-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:4px;color:var(--accent2);text-transform:uppercase;margin:24px 0 12px;}
+  .hs-body{font-size:15px;line-height:1.8;color:var(--text-dim);}
+  .hs-body strong{color:var(--text);}
+  .hs-body em{color:var(--accent);font-style:normal;}
+  .hs-card{background:var(--surface);border:1px solid rgba(255,255,255,0.05);border-radius:16px;padding:16px 18px;margin-bottom:12px;}
+  .hs-card-icon{font-size:22px;margin-bottom:6px;display:block;}
+  .hs-card-title{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--text);letter-spacing:1px;margin-bottom:6px;}
+  .hs-card-text{font-size:14px;line-height:1.7;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+
+<!-- SPLASH -->
+<div class="screen" id="splash">
+  <div class="splash-logo">SecondSense<br>Tap</div>
+  <div class="splash-tag">Train Your Mind</div>
+  <div class="splash-ring"><div class="brain-icon">🧠</div></div>
+
+  <!-- USERNAME + COUNTRY -->
+  <div class="username-box" id="usernameBox">
+    <button class="country-btn" id="countryBtn">
+      <span class="country-btn-flag" id="countryFlag">🌍</span>
+    </button>
+    <div class="country-divider"></div>
+    <span class="username-display" id="usernameDisplay">Tap to set your name...</span>
+    <input class="username-input" id="usernameInput" type="text" maxlength="20" placeholder="Your name..." style="display:none;">
+    <button class="username-edit-btn" id="usernameEditBtn">✏️</button>
+  </div>
+
+<!-- COUNTRY MODAL -->
+<div class="country-modal hidden" id="countryModal">
+  <div class="country-modal-header">
+    <div class="country-modal-title">SELECT COUNTRY</div>
+    <div class="country-modal-close" id="countryModalClose">✕</div>
+  </div>
+  <div class="country-search-wrap">
+    <input class="country-search" id="countrySearch" type="text" placeholder="🔍  Search country...">
+  </div>
+  <div class="country-list" id="countryList"></div>
+</div>
+  <div class="splash-desc">Master the art of mental counting.<br>Train your internal clock.</div>
+  <div class="stats-preview">
+    <div class="stat-item"><div class="stat-val" id="statSessions">0</div><div class="stat-lbl">Sessions</div></div>
+    <div class="stat-item"><div class="stat-val" id="statBest">—</div><div class="stat-lbl">Best Score</div></div>
+    <div class="stat-item"><div class="stat-val" id="statLevel">1</div><div class="stat-lbl">Level</div></div>
+  </div>
+  <div class="splash-btns">
+    <button class="btn-start" id="btnPlay">▶ PLAY</button>
+    <button class="btn-outline" id="btnStatsHome">MY STATS</button>
+    <button class="btn-outline" id="btnHiddenSkill" style="border-color:rgba(123,47,255,0.35);color:var(--accent2);">✦ THE HIDDEN SKILL</button>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="screen hidden" id="stats">
+  <div class="screen-header">
+    <div class="screen-title">MY STATS</div>
+  </div>
+  <div class="stats-inner" id="statsContent"></div>
+  <button class="btn-secondary" id="btnStatsBack" style="width:100%;max-width:340px;margin-top:8px;margin-bottom:16px;">← BACK</button>
+</div>
+
+<!-- HIDDEN SKILL -->
+<div class="screen hidden" id="hiddenSkill">
+  <div class="screen-header" style="padding-top:20px;margin-bottom:0;">
+    <div class="screen-title" style="color:var(--accent2);">THE HIDDEN SKILL</div>
+    <div class="btn-home" id="btnHiddenSkillBack">🏠</div>
+  </div>
+  <div class="hs-inner">
+
+    <div class="hs-divider"></div>
+    <div class="hs-quote">"Think you know when 10 seconds have passed?"</div>
+    <div class="hs-intro">
+      Most people don't. Not really.<br><br>
+      We check our phones, glance at clocks, rush through moments — but we've never truly felt time.<br><br>
+      <strong>This is your training ground.</strong>
+    </div>
+
+    <div class="hs-divider"></div>
+    <div class="hs-section-title">Your daily mental reset</div>
+    <div class="hs-body">
+      In a world of notifications, deadlines, and noise — your brain rarely gets to just <em>be present.</em><br><br>
+      Counting silently to ten sounds simple. But it forces something powerful: you step out of your thoughts and into the moment. No distractions. No multitasking. Just you and time.<br><br>
+      Think of it as a micro-meditation with a score.<br><br>
+      <strong>Train daily. Reset daily. Own your time.</strong>
+    </div>
+
+    <div class="hs-divider"></div>
+    <div class="hs-section-title">The ones who mastered it</div>
+    <div class="hs-body" style="margin-bottom:14px;">The world's greatest athletes and thinkers share one hidden skill — an almost supernatural sense of time. It's not a gift. It's trained.</div>
+
+    <div class="hs-card">
+      <span class="hs-card-icon">🧠</span>
+      <div class="hs-card-title">The greatest scientific minds</div>
+      <div class="hs-card-text">They don't just think about space. They think <em>in time.</em> The ability to mentally simulate events unfolding across seconds and years is what sets them apart.</div>
+    </div>
+
+    <div class="hs-card">
+      <span class="hs-card-icon">🏀</span>
+      <div class="hs-card-title">Basketball legends</div>
+      <div class="hs-card-text">The greatest teams can slow the game down mentally in the final seconds. They don't rush. They <em>feel</em> when to move — together.</div>
+    </div>
+
+    <div class="hs-card">
+      <span class="hs-card-icon">🏎️</span>
+      <div class="hs-card-title">Formula One drivers</div>
+      <div class="hs-card-text">Before every race, they close their eyes and drive the entire circuit from memory — corner by corner, brake point by brake point — within half a second of their actual lap time. Every millisecond, memorized.</div>
+    </div>
+
+    <div class="hs-card">
+      <span class="hs-card-icon">🎵</span>
+      <div class="hs-card-title">World-class musicians</div>
+      <div class="hs-card-text">The greatest performers don't just play notes. They live inside the rhythm. A fraction of a second off tempo and the entire piece falls apart — they never let that happen.</div>
+    </div>
+
+    <div class="hs-card">
+      <span class="hs-card-icon">💃</span>
+      <div class="hs-card-title">Professional dancers</div>
+      <div class="hs-card-text">Every choreography is a map of time. They feel the beat before it hits, anticipate the next move before the music asks for it. Their body and the clock are one.</div>
+    </div>
+
+    <div class="hs-divider"></div>
+
+  </div>
+</div>
+
+<!-- LEVEL SELECT -->
+<div class="screen hidden" id="levelSelect">
+  <div class="screen-header">
+    <div class="screen-title">SELECT LEVEL</div>
+    <div class="btn-home" id="btnLevelHome">🏠</div>
+  </div>
+  <div class="levels-grid" id="levelsGrid"></div>
+</div>
+
+<!-- PRE GAME -->
+<div class="screen hidden" id="pregame">
+  <div class="tension-label" id="tensionLabel">CONCENTRATE</div>
+  <div class="tension-title">Count to <span id="tensionTarget">10</span></div>
+  <div class="tension-box">
+    <div class="tension-count" id="tensionCount">10</div>
+    <div class="tension-desc" id="tensionDesc">seconds</div>
+  </div>
+  <div class="tension-warning" id="tensionWarning">⚡ Counter disappears at second 5</div>
+  <div id="countdownDisplay"></div>
+  <button class="btn-start" id="readyBtn">I'M READY</button>
+</div>
+
+<!-- GAME -->
+<div class="screen hidden" id="game">
+  <div class="game-header">
+    <div class="game-level-badge" id="gameLevelBadge">LEVEL 1</div>
+    <div class="game-target-badge">TARGET: <span id="gameTarget">10</span></div>
+  </div>
+  <div class="counter-area">
+    <div class="counter-ring visible" id="counterRing">
+      <div class="counter-number" id="counterNum"></div>
+    </div>
+    <div class="mental-msg" id="mentalMsg" style="display:none;">
+      <div class="big">Keep counting mentally</div>
+      <div class="sub">Tap when you reach <span id="mentalTarget">10</span></div>
+    </div>
+  </div>
+  <div class="tap-zone">
+    <div class="tap-btn disabled" id="tapBtn">
+      <div class="tap-icon">👆</div>
+      <div class="tap-text">TAP</div>
+      <div class="tap-hint">when you reach the target</div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div class="screen hidden" id="result">
+  <div class="result-header">
+    <span class="result-emoji" id="resultEmoji">🎯</span>
+    <div class="result-title" id="resultTitle">GREAT!</div>
+    <div class="result-subtitle" id="resultSubtitle">Level 1</div>
+  </div>
+  <div class="score-display">
+    <div class="score-pts" id="scorePoints">85</div>
+    <div class="score-label">POINTS</div>
+    <div class="score-deviation">You stopped at: <span id="scoreTapTime">10.00s</span></div>
+    <div class="score-deviation">Deviation: <span id="scoreDeviation">0.75s</span></div>
+  </div>
+  <div class="result-verdict">
+    You performed better than<br>
+    <span class="highlight" id="resultPercentile">62%</span>
+    of players on this level
+  </div>
+  <div class="pass-fail" id="passFail">✓ LEVEL PASSED</div>
+  <div class="result-btns">
+    <button class="btn-primary" id="nextLevelBtn" style="display:none;">NEXT LEVEL →</button>
+    <button class="btn-secondary" id="retryBtn">↺ TRY AGAIN</button>
+    <button class="btn-secondary" id="allLevelsBtn">☰ ALL LEVELS</button>
+    <button class="btn-secondary" id="resultHomeBtn">🏠 HOME</button>
+  </div>
+</div>
+
+<!-- FINAL RESULT -->
+<div class="screen hidden" id="finalResult">
+  <span class="trophy">🏆</span>
+  <div class="final-title">TRAINING COMPLETE!</div>
+  <div class="final-score-big">
+    <div class="final-pts" id="finalPts">0</div>
+    <div class="final-pts-label">TOTAL POINTS</div>
+    <div class="final-avg">Average per level: <span id="finalAvg">0</span> pts</div>
+  </div>
+  <div class="percentile-box">
+    <div class="percentile-label">YOU'RE IN THE</div>
+    <div class="percentile-val" id="finalPercentile">TOP 15%</div>
+    <div class="percentile-text">of all SecondSense Tap players</div>
+  </div>
+  <div class="breakdown">
+    <div class="breakdown-title">Level Breakdown</div>
+    <div id="breakdownList"></div>
+  </div>
+  <button class="btn-green" id="shareFinalBtn">📤 SHARE MY RESULTS</button>
+  <div class="final-btns">
+    <button class="btn-primary" id="playAgainBtn">PLAY AGAIN</button>
+    <button class="btn-secondary" id="finalHomeBtn">🏠 HOME</button>
+  </div>
+</div>
+
+<script>
+const LEVELS=[
+  {id:1,target:10,hideAt:5},{id:2,target:15,hideAt:7},{id:3,target:20,hideAt:10},
+  {id:4,target:30,hideAt:15},{id:5,target:40,hideAt:20},{id:6,target:50,hideAt:25},
+  {id:7,target:60,hideAt:30},{id:8,target:60,hideAt:20},{id:9,target:60,hideAt:10},
+  {id:10,target:60,hideAt:0}
+];
+
+// Parámetros gaussianos por nivel (µ media, σ desviación)
+const LEVEL_GAUSS=[
+  {mu:82,sigma:12}, // N1
+  {mu:80,sigma:12}, // N2
+  {mu:76,sigma:13}, // N3
+  {mu:70,sigma:14}, // N4
+  {mu:60,sigma:10}, // N5
+  {mu:55,sigma:8},  // N6
+  {mu:50,sigma:8},  // N7
+  {mu:50,sigma:8},  // N8
+  {mu:50,sigma:8},  // N9
+  {mu:50,sigma:8},  // N10
+];
+
+// Parámetros gaussianos globales (suma de sesión)
+const GLOBAL_MU=368, GLOBAL_SIGMA=180;
+
+const MIN_PASS=50, MAX_DEV=2000, MIN_RANKING=100;
+const SHEET_URL='https://script.google.com/macros/s/AKfycbyRdhzAolxlPI6qFtFYB8I2GYZYsdPCCR3n1p1exmo5v9-ZRjkrVkqiwc0fGFcZ4BOfsA/exec';
+let currentLevel=0, gameTimer=null, gameStartMs=null, gameActive=false, sessionScores=[];
+
+// ── AUDIO ENGINE ──
+let audioCtx=null;
+function getAudio(){
+  if(!audioCtx) audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(freq, type='sine', duration=0.08, vol=0.15, delay=0){
+  try{
+    const ctx=getAudio();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type=type; o.frequency.value=freq;
+    const t=ctx.currentTime+delay;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+duration);
+    o.start(t); o.stop(t+duration+0.05);
+  }catch(e){}
+}
+
+function playChord(freqs, type='sine', duration=0.3, vol=0.1){
+  freqs.forEach((f,i)=>playTone(f,type,duration,vol,i*0.02));
+}
+
+// Tick del contador (mientras es visible)
+function soundTick(){
+  playTone(880,'sine',0.04,0.08);
+}
+
+// Contador desaparece — whoosh descendente
+function soundWhoosh(){
+  try{
+    const ctx=getAudio();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    const t=ctx.currentTime;
+    o.connect(g); g.connect(ctx.destination);
+    o.type='sine';
+    o.frequency.setValueAtTime(600,t);
+    o.frequency.exponentialRampToValueAtTime(80,t+0.4);
+    g.gain.setValueAtTime(0.2,t);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.4);
+    o.start(t); o.stop(t+0.45);
+  }catch(e){}
+}
+
+// Beep countdown 3-2-1
+function soundBeep(isLast=false){
+  playTone(isLast?1200:600,'square',0.12,0.12);
+}
+
+// GO!
+function soundGo(){
+  playChord([523,659,784,1047],'sine',0.35,0.12);
+}
+
+// Tap del usuario
+function soundTap(){
+  try{
+    const ctx=getAudio();
+    const o=ctx.createOscillator();
+    const g=ctx.createGain();
+    const t=ctx.currentTime;
+    o.connect(g); g.connect(ctx.destination);
+    o.type='sine';
+    o.frequency.setValueAtTime(200,t);
+    o.frequency.exponentialRampToValueAtTime(60,t+0.15);
+    g.gain.setValueAtTime(0.3,t);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+0.15);
+    o.start(t); o.stop(t+0.2);
+  }catch(e){}
+}
+
+// Resultado perfecto (90-100)
+function soundPerfect(){
+  [0,0.12,0.24,0.38].forEach((delay,i)=>{
+    const freqs=[[523,659],[659,784],[784,1047],[1047,1319]];
+    freqs[i].forEach(f=>playTone(f,'sine',0.25,0.1,delay));
+  });
+}
+
+// Resultado bien (75-89)
+function soundGreat(){
+  playChord([523,659,784],'sine',0.3,0.12);
+  setTimeout(()=>playChord([659,784,1047],'sine',0.3,0.1),150);
+}
+
+// Resultado pasado (50-74)
+function soundPassed(){
+  playChord([440,554,659],'sine',0.25,0.1);
+}
+
+// Resultado fallado (<50)
+function soundFailed(){
+  try{
+    const ctx=getAudio();
+    [0,0.15].forEach(delay=>{
+      const o=ctx.createOscillator();
+      const g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.type='sawtooth';
+      const t=ctx.currentTime+delay;
+      o.frequency.setValueAtTime(220,t);
+      o.frequency.exponentialRampToValueAtTime(110,t+0.2);
+      g.gain.setValueAtTime(0.1,t);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.2);
+      o.start(t); o.stop(t+0.25);
+    });
+  }catch(e){}
+}
+
+// Level unlock
+function soundUnlock(){
+  [0,0.1,0.2,0.3].forEach((delay,i)=>{
+    const f=[523,659,784,1047][i];
+    playTone(f,'sine',0.2,0.12,delay);
+  });
+}
+
+// Fanfare final
+function soundFanfare(){
+  const notes=[
+    {f:523,d:0},{f:523,d:0.1},{f:523,d:0.2},{f:415,d:0.3},
+    {f:466,d:0.4},{f:523,d:0.55},{f:466,d:0.65},{f:523,d:0.75}
+  ];
+  notes.forEach(n=>{
+    playTone(n.f,'sine',0.18,0.12,n.d);
+    playTone(n.f*1.5,'sine',0.12,0.06,n.d);
+  });
+}
+
+// Click navegación
+function soundClick(){
+  playTone(440,'sine',0.05,0.06);
+}
+
+// Función que elige el sonido según puntuación
+function soundForResult(pts){
+  if(pts>=90) soundPerfect();
+  else if(pts>=75) soundGreat();
+  else if(pts>=50) soundPassed();
+  else soundFailed();
+}
+
+function save(d){try{localStorage.setItem('sst',JSON.stringify(d));}catch(e){}}
+function load(){try{const d=localStorage.getItem('sst');return d?JSON.parse(d):{sessions:[],unlockedLevel:1,levelBests:{}};}catch(e){return{sessions:[],unlockedLevel:1,levelBests:{}};}}
+function calcPts(devMs){return Math.max(0,Math.min(100,Math.round(100-(Math.abs(devMs)/MAX_DEV)*100)));}
+
+// Error function (aproximación de Abramowitz & Stegun)
+function erf(x){
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const s=x<0?-1:1; x=Math.abs(x);
+  const t=1/(1+p*x);
+  return s*(1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x));
+}
+
+// CDF gaussiana: P(X <= x) con media mu y desviación sigma
+function gaussCDF(x,mu,sigma){
+  return Math.round(Math.min(99.9,Math.max(0.1, 50*(1+erf((x-mu)/(sigma*Math.sqrt(2)))))));
+}
+
+// Percentil por nivel: "better than X% on this level"
+function getLevelPct(pts, lvId){
+  const g=LEVEL_GAUSS[lvId-1]||LEVEL_GAUSS[0];
+  return gaussCDF(pts, g.mu, g.sigma);
+}
+
+// Percentil global: "better than X% of all players"
+function getGlobalPct(total){
+  return gaussCDF(total, GLOBAL_MU, GLOBAL_SIGMA);
+}
+
+// Texto TOP para la pantalla de estadísticas
+function getTopText(total){
+  const p=getGlobalPct(total);
+  if(p>=99)return'TOP 1%';
+  if(p>=97)return'TOP 3%';
+  if(p>=95)return'TOP 5%';
+  if(p>=90)return'TOP 10%';
+  if(p>=85)return'TOP 15%';
+  if(p>=80)return'TOP 20%';
+  if(p>=75)return'TOP 25%';
+  if(p>=70)return'TOP 30%';
+  if(p>=60)return'TOP 40%';
+  if(p>=50)return'TOP 50%';
+  if(p>=40)return'TOP 60%';
+  if(p>=25)return'TOP 75%';
+  return'TOP 80%+';
+}
+
+function fmtDate(ts){const d=new Date(ts);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
+function clearTimers(){if(gameTimer){clearInterval(gameTimer);gameTimer=null;}gameActive=false;}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// SPLASH
+function initSplash(){
+  const d=load();
+  document.getElementById('statSessions').textContent=d.sessions.length;
+  const best=d.sessions.length?Math.max(...d.sessions.map(s=>s.total)):null;
+  document.getElementById('statBest').textContent=best!==null?best:'—';
+  document.getElementById('statLevel').textContent=Math.min(d.unlockedLevel||1,10);
+  initUsername();
+}
+
+function getUsername(){ const d=load(); return d.username||''; }
+function getCountry(){ const d=load(); return d.country||null; }
+
+// Lista completa de países
+const COUNTRIES=[
+  {code:'AF',name:'Afghanistan',flag:'🇦🇫'},{code:'AL',name:'Albania',flag:'🇦🇱'},{code:'DZ',name:'Algeria',flag:'🇩🇿'},
+  {code:'AD',name:'Andorra',flag:'🇦🇩'},{code:'AO',name:'Angola',flag:'🇦🇴'},{code:'AG',name:'Antigua and Barbuda',flag:'🇦🇬'},
+  {code:'AR',name:'Argentina',flag:'🇦🇷'},{code:'AM',name:'Armenia',flag:'🇦🇲'},{code:'AU',name:'Australia',flag:'🇦🇺'},
+  {code:'AT',name:'Austria',flag:'🇦🇹'},{code:'AZ',name:'Azerbaijan',flag:'🇦🇿'},{code:'BS',name:'Bahamas',flag:'🇧🇸'},
+  {code:'BH',name:'Bahrain',flag:'🇧🇭'},{code:'BD',name:'Bangladesh',flag:'🇧🇩'},{code:'BB',name:'Barbados',flag:'🇧🇧'},
+  {code:'BY',name:'Belarus',flag:'🇧🇾'},{code:'BE',name:'Belgium',flag:'🇧🇪'},{code:'BZ',name:'Belize',flag:'🇧🇿'},
+  {code:'BJ',name:'Benin',flag:'🇧🇯'},{code:'BT',name:'Bhutan',flag:'🇧🇹'},{code:'BO',name:'Bolivia',flag:'🇧🇴'},
+  {code:'BA',name:'Bosnia and Herzegovina',flag:'🇧🇦'},{code:'BW',name:'Botswana',flag:'🇧🇼'},{code:'BR',name:'Brazil',flag:'🇧🇷'},
+  {code:'BN',name:'Brunei',flag:'🇧🇳'},{code:'BG',name:'Bulgaria',flag:'🇧🇬'},{code:'BF',name:'Burkina Faso',flag:'🇧🇫'},
+  {code:'BI',name:'Burundi',flag:'🇧🇮'},{code:'CV',name:'Cape Verde',flag:'🇨🇻'},{code:'KH',name:'Cambodia',flag:'🇰🇭'},
+  {code:'CM',name:'Cameroon',flag:'🇨🇲'},{code:'CA',name:'Canada',flag:'🇨🇦'},{code:'CF',name:'Central African Republic',flag:'🇨🇫'},
+  {code:'TD',name:'Chad',flag:'🇹🇩'},{code:'CL',name:'Chile',flag:'🇨🇱'},{code:'CN',name:'China',flag:'🇨🇳'},
+  {code:'CO',name:'Colombia',flag:'🇨🇴'},{code:'KM',name:'Comoros',flag:'🇰🇲'},{code:'CG',name:'Congo',flag:'🇨🇬'},
+  {code:'CD',name:'Congo (DRC)',flag:'🇨🇩'},{code:'CR',name:'Costa Rica',flag:'🇨🇷'},{code:'HR',name:'Croatia',flag:'🇭🇷'},
+  {code:'CU',name:'Cuba',flag:'🇨🇺'},{code:'CY',name:'Cyprus',flag:'🇨🇾'},{code:'CZ',name:'Czech Republic',flag:'🇨🇿'},
+  {code:'DK',name:'Denmark',flag:'🇩🇰'},{code:'DJ',name:'Djibouti',flag:'🇩🇯'},{code:'DM',name:'Dominica',flag:'🇩🇲'},
+  {code:'DO',name:'Dominican Republic',flag:'🇩🇴'},{code:'EC',name:'Ecuador',flag:'🇪🇨'},{code:'EG',name:'Egypt',flag:'🇪🇬'},
+  {code:'SV',name:'El Salvador',flag:'🇸🇻'},{code:'GQ',name:'Equatorial Guinea',flag:'🇬🇶'},{code:'ER',name:'Eritrea',flag:'🇪🇷'},
+  {code:'EE',name:'Estonia',flag:'🇪🇪'},{code:'SZ',name:'Eswatini',flag:'🇸🇿'},{code:'ET',name:'Ethiopia',flag:'🇪🇹'},
+  {code:'FJ',name:'Fiji',flag:'🇫🇯'},{code:'FI',name:'Finland',flag:'🇫🇮'},{code:'FR',name:'France',flag:'🇫🇷'},
+  {code:'GA',name:'Gabon',flag:'🇬🇦'},{code:'GM',name:'Gambia',flag:'🇬🇲'},{code:'GE',name:'Georgia',flag:'🇬🇪'},
+  {code:'DE',name:'Germany',flag:'🇩🇪'},{code:'GH',name:'Ghana',flag:'🇬🇭'},{code:'GR',name:'Greece',flag:'🇬🇷'},
+  {code:'GD',name:'Grenada',flag:'🇬🇩'},{code:'GT',name:'Guatemala',flag:'🇬🇹'},{code:'GN',name:'Guinea',flag:'🇬🇳'},
+  {code:'GW',name:'Guinea-Bissau',flag:'🇬🇼'},{code:'GY',name:'Guyana',flag:'🇬🇾'},{code:'HT',name:'Haiti',flag:'🇭🇹'},
+  {code:'HN',name:'Honduras',flag:'🇭🇳'},{code:'HU',name:'Hungary',flag:'🇭🇺'},{code:'IS',name:'Iceland',flag:'🇮🇸'},
+  {code:'IN',name:'India',flag:'🇮🇳'},{code:'ID',name:'Indonesia',flag:'🇮🇩'},{code:'IR',name:'Iran',flag:'🇮🇷'},
+  {code:'IQ',name:'Iraq',flag:'🇮🇶'},{code:'IE',name:'Ireland',flag:'🇮🇪'},{code:'IL',name:'Israel',flag:'🇮🇱'},
+  {code:'IT',name:'Italy',flag:'🇮🇹'},{code:'JM',name:'Jamaica',flag:'🇯🇲'},{code:'JP',name:'Japan',flag:'🇯🇵'},
+  {code:'JO',name:'Jordan',flag:'🇯🇴'},{code:'KZ',name:'Kazakhstan',flag:'🇰🇿'},{code:'KE',name:'Kenya',flag:'🇰🇪'},
+  {code:'KI',name:'Kiribati',flag:'🇰🇮'},{code:'KW',name:'Kuwait',flag:'🇰🇼'},{code:'KG',name:'Kyrgyzstan',flag:'🇰🇬'},
+  {code:'LA',name:'Laos',flag:'🇱🇦'},{code:'LV',name:'Latvia',flag:'🇱🇻'},{code:'LB',name:'Lebanon',flag:'🇱🇧'},
+  {code:'LS',name:'Lesotho',flag:'🇱🇸'},{code:'LR',name:'Liberia',flag:'🇱🇷'},{code:'LY',name:'Libya',flag:'🇱🇾'},
+  {code:'LI',name:'Liechtenstein',flag:'🇱🇮'},{code:'LT',name:'Lithuania',flag:'🇱🇹'},{code:'LU',name:'Luxembourg',flag:'🇱🇺'},
+  {code:'MG',name:'Madagascar',flag:'🇲🇬'},{code:'MW',name:'Malawi',flag:'🇲🇼'},{code:'MY',name:'Malaysia',flag:'🇲🇾'},
+  {code:'MV',name:'Maldives',flag:'🇲🇻'},{code:'ML',name:'Mali',flag:'🇲🇱'},{code:'MT',name:'Malta',flag:'🇲🇹'},
+  {code:'MH',name:'Marshall Islands',flag:'🇲🇭'},{code:'MR',name:'Mauritania',flag:'🇲🇷'},{code:'MU',name:'Mauritius',flag:'🇲🇺'},
+  {code:'MX',name:'Mexico',flag:'🇲🇽'},{code:'FM',name:'Micronesia',flag:'🇫🇲'},{code:'MD',name:'Moldova',flag:'🇲🇩'},
+  {code:'MC',name:'Monaco',flag:'🇲🇨'},{code:'MN',name:'Mongolia',flag:'🇲🇳'},{code:'ME',name:'Montenegro',flag:'🇲🇪'},
+  {code:'MA',name:'Morocco',flag:'🇲🇦'},{code:'MZ',name:'Mozambique',flag:'🇲🇿'},{code:'MM',name:'Myanmar',flag:'🇲🇲'},
+  {code:'NA',name:'Namibia',flag:'🇳🇦'},{code:'NR',name:'Nauru',flag:'🇳🇷'},{code:'NP',name:'Nepal',flag:'🇳🇵'},
+  {code:'NL',name:'Netherlands',flag:'🇳🇱'},{code:'NZ',name:'New Zealand',flag:'🇳🇿'},{code:'NI',name:'Nicaragua',flag:'🇳🇮'},
+  {code:'NE',name:'Niger',flag:'🇳🇪'},{code:'NG',name:'Nigeria',flag:'🇳🇬'},{code:'NO',name:'Norway',flag:'🇳🇴'},
+  {code:'OM',name:'Oman',flag:'🇴🇲'},{code:'PK',name:'Pakistan',flag:'🇵🇰'},{code:'PW',name:'Palau',flag:'🇵🇼'},
+  {code:'PA',name:'Panama',flag:'🇵🇦'},{code:'PG',name:'Papua New Guinea',flag:'🇵🇬'},{code:'PY',name:'Paraguay',flag:'🇵🇾'},
+  {code:'PE',name:'Peru',flag:'🇵🇪'},{code:'PH',name:'Philippines',flag:'🇵🇭'},{code:'PL',name:'Poland',flag:'🇵🇱'},
+  {code:'PT',name:'Portugal',flag:'🇵🇹'},{code:'QA',name:'Qatar',flag:'🇶🇦'},{code:'RO',name:'Romania',flag:'🇷🇴'},
+  {code:'RU',name:'Russia',flag:'🇷🇺'},{code:'RW',name:'Rwanda',flag:'🇷🇼'},{code:'KN',name:'Saint Kitts and Nevis',flag:'🇰🇳'},
+  {code:'LC',name:'Saint Lucia',flag:'🇱🇨'},{code:'VC',name:'Saint Vincent',flag:'🇻🇨'},{code:'WS',name:'Samoa',flag:'🇼🇸'},
+  {code:'SM',name:'San Marino',flag:'🇸🇲'},{code:'ST',name:'Sao Tome and Principe',flag:'🇸🇹'},{code:'SA',name:'Saudi Arabia',flag:'🇸🇦'},
+  {code:'SN',name:'Senegal',flag:'🇸🇳'},{code:'RS',name:'Serbia',flag:'🇷🇸'},{code:'SC',name:'Seychelles',flag:'🇸🇨'},
+  {code:'SL',name:'Sierra Leone',flag:'🇸🇱'},{code:'SG',name:'Singapore',flag:'🇸🇬'},{code:'SK',name:'Slovakia',flag:'🇸🇰'},
+  {code:'SI',name:'Slovenia',flag:'🇸🇮'},{code:'SB',name:'Solomon Islands',flag:'🇸🇧'},{code:'SO',name:'Somalia',flag:'🇸🇴'},
+  {code:'ZA',name:'South Africa',flag:'🇿🇦'},{code:'SS',name:'South Sudan',flag:'🇸🇸'},{code:'ES',name:'Spain',flag:'🇪🇸'},
+  {code:'LK',name:'Sri Lanka',flag:'🇱🇰'},{code:'SD',name:'Sudan',flag:'🇸🇩'},{code:'SR',name:'Suriname',flag:'🇸🇷'},
+  {code:'SE',name:'Sweden',flag:'🇸🇪'},{code:'CH',name:'Switzerland',flag:'🇨🇭'},{code:'SY',name:'Syria',flag:'🇸🇾'},
+  {code:'TW',name:'Taiwan',flag:'🇹🇼'},{code:'TJ',name:'Tajikistan',flag:'🇹🇯'},{code:'TZ',name:'Tanzania',flag:'🇹🇿'},
+  {code:'TH',name:'Thailand',flag:'🇹🇭'},{code:'TL',name:'Timor-Leste',flag:'🇹🇱'},{code:'TG',name:'Togo',flag:'🇹🇬'},
+  {code:'TO',name:'Tonga',flag:'🇹🇴'},{code:'TT',name:'Trinidad and Tobago',flag:'🇹🇹'},{code:'TN',name:'Tunisia',flag:'🇹🇳'},
+  {code:'TR',name:'Turkey',flag:'🇹🇷'},{code:'TM',name:'Turkmenistan',flag:'🇹🇲'},{code:'TV',name:'Tuvalu',flag:'🇹🇻'},
+  {code:'UG',name:'Uganda',flag:'🇺🇬'},{code:'UA',name:'Ukraine',flag:'🇺🇦'},{code:'AE',name:'United Arab Emirates',flag:'🇦🇪'},
+  {code:'GB',name:'United Kingdom',flag:'🇬🇧'},{code:'US',name:'United States',flag:'🇺🇸'},{code:'UY',name:'Uruguay',flag:'🇺🇾'},
+  {code:'UZ',name:'Uzbekistan',flag:'🇺🇿'},{code:'VU',name:'Vanuatu',flag:'🇻🇺'},{code:'VE',name:'Venezuela',flag:'🇻🇪'},
+  {code:'VN',name:'Vietnam',flag:'🇻🇳'},{code:'YE',name:'Yemen',flag:'🇾🇪'},{code:'ZM',name:'Zambia',flag:'🇿🇲'},
+  {code:'ZW',name:'Zimbabwe',flag:'🇿🇼'}
+];
+
+function initUsername(){
+  const name=getUsername();
+  const country=getCountry();
+  const display=document.getElementById('usernameDisplay');
+  const input=document.getElementById('usernameInput');
+  // Bandera — forzar re-render en Android
+  const flagEl=document.getElementById('countryFlag');
+  flagEl.textContent='';
+  requestAnimationFrame(()=>{ flagEl.textContent=country?country.flag:'🌍'; });
+  // Nombre
+  if(name){
+    display.textContent=name;
+    display.classList.remove('placeholder');
+  } else {
+    display.textContent='Tap to set your name...';
+    display.classList.add('placeholder');
+  }
+  display.style.display='block';
+  input.style.display='none';
+}
+
+function startEditUsername(){
+  const display=document.getElementById('usernameDisplay');
+  const input=document.getElementById('usernameInput');
+  input.value=getUsername();
+  display.style.display='none';
+  input.style.display='block';
+  input.focus();
+  input.select();
+}
+
+function generatePin(){
+  return String(Math.floor(1000+Math.random()*9000));
+}
+
+function showUsernameStatus(msg, color){
+  let el=document.getElementById('usernameStatus');
+  if(!el){
+    el=document.createElement('div');
+    el.id='usernameStatus';
+    el.style.cssText='font-size:12px;text-align:center;width:100%;max-width:300px;min-height:18px;letter-spacing:1px;transition:color 0.3s;';
+    document.getElementById('usernameBox').insertAdjacentElement('afterend',el);
+  }
+  el.textContent=msg;
+  el.style.color=color||'var(--text-dim)';
+}
+
+async function saveUsername(){
+  const input=document.getElementById('usernameInput');
+  const val=input.value.trim().slice(0,20);
+  if(!val){ initUsername(); showUsernameStatus('',''); return; }
+  const d=load();
+  const currentName=d.username||'';
+  if(val===currentName){ initUsername(); return; }
+  showUsernameStatus('Checking...','var(--text-dim)');
+  try{
+    const res=await fetch(`${SHEET_URL}?action=check&username=${encodeURIComponent(val)}`);
+    const json=await res.json();
+    if(!json.exists){
+      // Username libre — generar PIN y registrar en Sheet
+      const pin=generatePin();
+      const country=getCountry()||{name:'',flag:''};
+      await fetch(SHEET_URL,{method:'POST',body:JSON.stringify({
+        action:'register', username:val, pin,
+        country:country.name, flag:country.flag
+      })});
+      d.username=val; d.pin=pin; save(d);
+      initUsername();
+      showUsernameStatus(`✓ Registered · PIN: ${pin} — save it!`,'var(--success)');
+      setTimeout(()=>showUsernameStatus('',''),8000);
+    } else {
+      initUsername();
+      askPinForUsername(val);
+    }
+  } catch(e){
+    if(!d.pin) d.pin=generatePin();
+    d.username=val; save(d);
+    initUsername();
+    showUsernameStatus('✓ Saved offline — will sync later','var(--text-dim)');
+    setTimeout(()=>showUsernameStatus('',''),4000);
+  }
+}
+
+function askPinForUsername(username){
+  const pin=prompt(`"${username}" already exists.\n\nIs this you? Enter your 4-digit PIN:`);
+  if(!pin){ showUsernameStatus('✗ Username taken — choose another','var(--danger)'); return; }
+  const country=getCountry()||{name:'',flag:''};
+  fetch(SHEET_URL,{method:'POST',body:JSON.stringify({
+    action:'verify', username, pin, country:country.name, flag:country.flag
+  })})
+  .then(r=>r.json())
+  .then(json=>{
+    if(json.status==='ok'){
+      const d=load(); d.username=username; d.pin=pin; save(d);
+      initUsername();
+      showUsernameStatus('✓ Welcome back!','var(--success)');
+      setTimeout(()=>showUsernameStatus('',''),3000);
+    } else {
+      showUsernameStatus('✗ Wrong PIN — choose a different username','var(--danger)');
+    }
+  })
+  .catch(()=>showUsernameStatus('✗ Could not verify — try again','var(--danger)'));
+}
+
+// Envío automático a Scores (solo si >= MIN_RANKING pts y tiene username)
+async function submitToRanking(total){
+  const d=load();
+  const username=d.username;
+  if(!username||total<MIN_RANKING) return;
+  const country=d.country||{name:'',flag:''};
+  const maxEntry=sessionScores.filter(Boolean).reduce((b,r)=>r.level>b.level?r:b,{level:0,points:0});
+  try{
+    await fetch(SHEET_URL,{method:'POST',body:JSON.stringify({
+      action:'score', username, pin:d.pin||'', total,
+      country:country.name, flag:country.flag,
+      maxLevel:maxEntry.level, maxLevelPts:maxEntry.points
+    })});
+  }catch(e){ /* silencioso */ }
+}
+
+// COUNTRY MODAL
+function openCountryModal(){
+  const modal=document.getElementById('countryModal');
+  const search=document.getElementById('countrySearch');
+  modal.classList.remove('hidden');
+  search.value='';
+  renderCountryList('');
+  setTimeout(()=>search.focus(),200);
+}
+
+function closeCountryModal(){
+  document.getElementById('countryModal').classList.add('hidden');
+}
+
+function renderCountryList(query){
+  const list=document.getElementById('countryList');
+  const current=getCountry();
+  const filtered=query
+    ?COUNTRIES.filter(c=>c.name.toLowerCase().includes(query.toLowerCase()))
+    :COUNTRIES;
+  list.innerHTML='';
+  filtered.forEach(c=>{
+    const item=document.createElement('div');
+    item.className='country-item'+(current&&current.code===c.code?' selected':'');
+    item.innerHTML=`<span class="country-item-flag">${c.flag}</span><span class="country-item-name">${c.name}</span>`;
+    item.addEventListener('click',()=>{
+      const d=load();
+      d.country={code:c.code,name:c.name,flag:c.flag};
+      save(d);
+      closeCountryModal();
+      // Pequeño delay para que el modal se cierre antes del re-render
+      setTimeout(()=>initUsername(), 50);
+    });
+    list.appendChild(item);
+  });
+}
+
+// STATS
+function showStats(){
+  const d=load();
+  const c=document.getElementById('statsContent');
+  c.innerHTML='';
+
+  if(!d.sessions||!d.sessions.length){
+    c.innerHTML='<div class="stats-no-data">No sessions yet.<br>Play to see your stats here! 🧠</div>';
+    loadGlobalRanking(c,getUsername());
+    showScreen('stats'); return;
+  }
+
+  const bestSession=d.sessions.reduce((a,b)=>a.total>b.total?a:b);
+  const topPct=getTopText(bestSession.total);
+
+  // 1. SHARE — arriba del todo
+  const shareBtn=document.createElement('button');shareBtn.className='btn-green';
+  shareBtn.style.cssText='width:100%;max-width:340px;';
+  shareBtn.textContent='📤 SHARE MY STATS';
+  shareBtn.addEventListener('click',()=>doShare(d,bestSession,topPct));
+  c.appendChild(shareBtn);
+
+  // 2. Percentil
+  const pb=document.createElement('div');pb.className='percentile-box';
+  pb.innerHTML=`<div class="percentile-label">YOUR BEST — YOU'RE IN THE</div><div class="percentile-val">${topPct}</div><div class="percentile-text">of all SecondSense Tap players</div>`;
+  c.appendChild(pb);
+
+  // 3. Best session
+  const bc=document.createElement('div');bc.className='final-score-big';
+  bc.innerHTML=`
+    <div style="font-family:'Orbitron',monospace;font-size:11px;letter-spacing:3px;color:var(--text-dim);margin-bottom:6px;">🏆 BEST SESSION</div>
+    <div class="final-pts">${bestSession.total}</div>
+    <div class="final-pts-label">TOTAL POINTS</div>
+    <div class="final-avg">${fmtDate(bestSession.date)} · <span>${bestSession.levelsPlayed||'?'} levels played</span></div>`;
+  c.appendChild(bc);
+
+  // 4. Best score per level — scroll 5 items
+  if(d.levelBests&&Object.keys(d.levelBests).length){
+    const bk=document.createElement('div');bk.className='breakdown';
+    bk.innerHTML='<div class="breakdown-title">Best Score Per Level</div>';
+    const bkScroll=document.createElement('div');bkScroll.className='breakdown-scroll';
+    LEVELS.forEach(lv=>{
+      const sc=d.levelBests[lv.id];if(sc===undefined)return;
+      const cls=sc>=80?'great':sc>=50?'ok':'poor';
+      bkScroll.innerHTML+=`<div class="breakdown-row"><div class="lv">LVL ${lv.id} · ${lv.target}s</div><div class="sc ${cls}">${sc} pts</div><div class="dev">${sc>=MIN_PASS?'✓':'✗'}</div></div>`;
+    });
+    bk.appendChild(bkScroll);
+    c.appendChild(bk);
+  }
+
+  // 5. Session history — scroll 5 items
+  const hist=document.createElement('div');hist.className='breakdown';
+  hist.innerHTML=`<div class="breakdown-title">Session History (${d.sessions.length}/30)</div>`;
+  const histScroll=document.createElement('div');histScroll.className='breakdown-scroll';
+  [...d.sessions].sort((a,b)=>b.date-a.date).forEach(s=>{
+    const isBest=s.date===bestSession.date&&s.total===bestSession.total;
+    const cls=s.total>=600?'great':s.total>=300?'ok':'poor';
+    histScroll.innerHTML+=`<div class="breakdown-row" style="${isBest?'border-color:rgba(0,245,255,0.3);':''}">`+
+      `<div class="lv">${fmtDate(s.date)}</div>`+
+      `<div class="sc ${cls}">${s.total} pts${isBest?' 🏆':''}</div>`+
+      `<div class="dev">${s.levelsPlayed||'?'} lvls</div></div>`;
+  });
+  hist.appendChild(histScroll);
+  c.appendChild(hist);
+
+  // 6. Global ranking — carga async
+  loadGlobalRanking(c, getUsername());
+  showScreen('stats');
+}
+
+async function loadGlobalRanking(container, myUsername){
+  const section=document.createElement('div');section.className='breakdown';
+  section.innerHTML='<div class="breakdown-title">🌍 Global Ranking — Top 20</div>'+
+    '<div class="breakdown-row"><div class="lv" style="color:var(--text-dim)">Loading...</div></div>';
+  container.appendChild(section);
+  try{
+    const res=await fetch(`${SHEET_URL}?action=ranking`);
+    const json=await res.json();
+    section.innerHTML='<div class="breakdown-title">🌍 Global Ranking — Top 20</div>';
+    const scroll=document.createElement('div');scroll.className='breakdown-scroll';
+    if(!json.ranking||!json.ranking.length){
+      scroll.innerHTML='<div class="breakdown-row"><div class="lv" style="color:var(--text-dim)">No scores yet — be the first!</div></div>';
+    } else {
+      json.ranking.slice(0,20).forEach((r,i)=>{
+        const pos=i+1;
+        const isMe=myUsername&&r.username===myUsername;
+        const posClass=pos===1?'gold':pos===2?'silver':pos===3?'bronze':'';
+        const flag=r.flag&&r.flag.trim()?r.flag:'🌍';
+        const date=r.date?fmtDate(new Date(r.date).getTime()):'';
+        scroll.innerHTML+=`<div class="breakdown-row" style="${isMe?'border-color:rgba(0,245,255,0.4);background:rgba(0,245,255,0.04);':''}">
+          <div class="ranking-pos ${posClass}">${pos}</div>
+          <div class="ranking-flag">${flag}</div>
+          <div class="ranking-name ${isMe?'ranking-me':''}">${r.username}${isMe?' ◀':''}</div>
+          <div class="ranking-pts">${r.total}</div>
+          <div class="ranking-date">${date}</div>
+        </div>`;
+      });
+    }
+    section.appendChild(scroll);
+  }catch(e){
+    section.innerHTML='<div class="breakdown-title">🌍 Global Ranking — Top 20</div>'+
+      '<div class="breakdown-row"><div class="lv" style="color:var(--text-dim)">Could not load — check connection</div></div>';
+  }
+}
+
+function endSession(){
+  const played=sessionScores.filter(Boolean);
+  if(played.length===0) return;
+  const total=played.reduce((s,r)=>s+r.points,0);
+  const d=load();
+  // Guardar sesión local
+  d.sessions.push({date:Date.now(),total,levelsPlayed:played.length});
+  if(d.sessions.length>30)d.sessions.shift();
+  save(d);
+  // Enviar al ranking si supera mínimo
+  if(total>=MIN_RANKING) submitToRanking(total);
+}
+
+function goHome(){
+  endSession();
+  sessionScores=[];
+  initSplash();
+  showScreen('splash');
+}
+
+function doShare(d,bestSession,topPct){
+  const bestLevelId=d.levelBests?Math.max(...Object.keys(d.levelBests).map(Number)):1;
+  const bestLevelPts=d.levelBests?d.levelBests[bestLevelId]:0;
+  const username=getUsername()||'Anonymous';
+  const country=getCountry();
+  const countryLine=country?`${country.flag} ${country.name}`:'';
+  try{
+    const W=600,H=860;
+    const cv=document.createElement('canvas');cv.width=W;cv.height=H;
+    const ctx=cv.getContext('2d');
+
+    // Fondo
+    const bg=ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,'#04040f');bg.addColorStop(0.5,'#0a0028');bg.addColorStop(1,'#04040f');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+
+    // Grid
+    ctx.strokeStyle='rgba(0,245,255,0.04)';ctx.lineWidth=1;
+    for(let x=0;x<W;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Borde degradado
+    const brd=ctx.createLinearGradient(0,0,W,H);
+    brd.addColorStop(0,'#00f5ff');brd.addColorStop(0.5,'#7b2fff');brd.addColorStop(1,'#ff2d78');
+    ctx.strokeStyle=brd;ctx.lineWidth=3;ctx.strokeRect(3,3,W-6,H-6);
+
+    const line=(y)=>{
+      const lg=ctx.createLinearGradient(60,0,W-60,0);
+      lg.addColorStop(0,'transparent');lg.addColorStop(0.5,'rgba(0,245,255,0.4)');lg.addColorStop(1,'transparent');
+      ctx.strokeStyle=lg;ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(60,y);ctx.lineTo(W-60,y);ctx.stroke();
+    };
+
+    ctx.textAlign='center';
+
+    // Username + país destacado arriba
+    ctx.font='bold 28px monospace';ctx.fillStyle='#e8e8ff';ctx.letterSpacing='2px';
+    ctx.fillText(username,W/2,50);
+    if(countryLine){
+      ctx.font='16px monospace';ctx.fillStyle='rgba(232,232,255,0.6)';ctx.letterSpacing='1px';
+      ctx.fillText(countryLine,W/2,76);
+    }
+    ctx.font='11px monospace';ctx.fillStyle='rgba(0,245,255,0.45)';ctx.letterSpacing='4px';
+    ctx.fillText('SECONDSENSE TAP · TRAIN YOUR MIND',W/2,countryLine?100:76);
+    line(countryLine?118:96);
+
+    // Percentil
+    ctx.font='bold 12px monospace';ctx.fillStyle='rgba(112,112,170,0.8)';ctx.letterSpacing='3px';
+    ctx.fillText("YOU'RE IN THE",W/2,134);
+    const pg=ctx.createLinearGradient(100,140,W-100,210);
+    pg.addColorStop(0,'#ff2d78');pg.addColorStop(1,'#ff7b2f');
+    ctx.fillStyle=pg;ctx.font='bold 68px monospace';ctx.letterSpacing='1px';
+    ctx.fillText(topPct,W/2,215);
+    ctx.font='12px monospace';ctx.fillStyle='rgba(232,232,255,0.6)';ctx.letterSpacing='1px';
+    ctx.fillText('of all SecondSense Tap players',W/2,247);
+    line(267);
+
+    // Score
+    ctx.font='bold 12px monospace';ctx.fillStyle='rgba(112,112,170,0.8)';ctx.letterSpacing='3px';
+    ctx.fillText('BEST SESSION SCORE',W/2,303);
+    const sg=ctx.createLinearGradient(150,310,W-150,410);
+    sg.addColorStop(0,'#00f5ff');sg.addColorStop(1,'#7b2fff');
+    ctx.fillStyle=sg;ctx.font='bold 100px monospace';ctx.letterSpacing='0px';
+    ctx.fillText(String(bestSession.total),W/2,415);
+    ctx.font='bold 12px monospace';ctx.fillStyle='rgba(112,112,170,0.6)';ctx.letterSpacing='3px';
+    ctx.fillText('POINTS',W/2,445);
+    line(470);
+
+    // Max level
+    ctx.font='bold 12px monospace';ctx.fillStyle='rgba(112,112,170,0.8)';ctx.letterSpacing='3px';
+    ctx.fillText('MAX LEVEL REACHED',W/2,508);
+    ctx.font='bold 60px monospace';ctx.fillStyle='#00ffaa';ctx.letterSpacing='0px';
+    ctx.fillText(`LEVEL ${bestLevelId}`,W/2,585);
+    ctx.font='13px monospace';ctx.fillStyle='rgba(0,255,170,0.55)';ctx.letterSpacing='1px';
+    ctx.fillText(`Best on this level: ${bestLevelPts} pts`,W/2,617);
+    line(643);
+
+    // Footer
+    ctx.font='bold 13px monospace';ctx.fillStyle='rgba(0,245,255,0.5)';ctx.letterSpacing='2px';
+    ctx.fillText('Can you beat me?  🧠',W/2,695);
+    ctx.font='11px monospace';ctx.fillStyle='rgba(112,112,170,0.5)';ctx.letterSpacing='1px';
+    ctx.fillText(fmtDate(bestSession.date),W/2,730);
+
+    cv.toBlob(blob=>{
+      if(!blob){fallbackShare(bestSession.total,topPct,bestLevelId,bestLevelPts,username);return;}
+      const file=new File([blob],'secondsense-tap.png',{type:'image/png'});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){
+        navigator.share({title:'SecondSense Tap',files:[file]});
+      } else {
+        const url=URL.createObjectURL(blob);
+        const a=document.createElement('a');a.href=url;a.download='secondsense-tap.png';a.click();
+        setTimeout(()=>URL.revokeObjectURL(url),1000);
+      }
+    },'image/png');
+  } catch(e){ fallbackShare(bestSession.total,topPct,bestLevelId,bestLevelPts,username); }
+}
+
+function fallbackShare(total,topPct,levelId,levelPts,username){
+  const name=username||getUsername()||'Anonymous';
+  const country=getCountry();
+  const countryStr=country?` ${country.flag} ${country.name}`:'';
+  const text=`🧠 SecondSense Tap\n${name}${countryStr}\n${'─'.repeat(24)}\nI'm in the ${topPct} of players!\nBest session: ${total} pts\nMax level reached: ${levelId} (${levelPts} pts)\n${'─'.repeat(24)}\nCan you beat me? 👆`;
+  if(navigator.share){navigator.share({title:'SecondSense Tap',text});}
+  else{navigator.clipboard.writeText(text).then(()=>alert('Copied! Share with your friends 🎯'));}
+}
+
+// LEVEL SELECT
+function showLevelSelect(){
+  clearTimers();
+  const d=load();
+  const unlocked=d.unlockedLevel||1;
+  const grid=document.getElementById('levelsGrid');
+  grid.innerHTML='';
+  LEVELS.forEach((lv,i)=>{
+    const best=d.levelBests?d.levelBests[lv.id]:null;
+    const isUnlocked=lv.id<=unlocked;
+    const isPassed=best!==null&&best>=MIN_PASS;
+    const isCurrent=lv.id===unlocked&&!isPassed;
+    const card=document.createElement('div');
+    card.className='level-card '+((!isUnlocked)?'locked':isPassed?'completed':isCurrent?'current':'unlocked');
+    const hideText=lv.hideAt===0?'No counter!':'Hides at '+lv.hideAt+'s';
+    const scoreHtml=best!==null?`<div class="level-score">Best: ${best} pts</div>`:'';
+    card.innerHTML=`
+      ${!isUnlocked?'<div class="lock-icon">🔒</div>':''}
+      ${isPassed?'<div class="check-icon">✓</div>':''}
+      <div class="level-num">LEVEL ${lv.id}</div>
+      <div class="level-target">${lv.target}</div>
+      <div class="level-info">${hideText}</div>
+      ${scoreHtml}
+      <div class="level-progress"><div class="level-progress-fill" style="width:${best||0}%"></div></div>`;
+    if(isUnlocked) card.addEventListener('click',()=>startPreGame(i));
+    grid.appendChild(card);
+  });
+  showScreen('levelSelect');
+}
+
+// PRE GAME
+function startPreGame(idx){
+  clearTimers();
+  if(idx===0) sessionScores=[];
+  currentLevel=idx;
+  const lv=LEVELS[idx];
+  document.getElementById('tensionTarget').textContent=lv.target;
+  document.getElementById('tensionCount').textContent=lv.target;
+  document.getElementById('mentalTarget').textContent=lv.target;
+  const label=document.getElementById('tensionLabel');
+  const warn=document.getElementById('tensionWarning');
+  const desc=document.getElementById('tensionDesc');
+  if(lv.hideAt===0){
+    label.textContent='⚠ ULTIMATE CHALLENGE';
+    warn.textContent='🧠 Counter will NEVER appear — trust your mind';
+    warn.className='tension-warning invisible';
+    desc.textContent='seconds — no counter shown';
+  } else {
+    label.textContent='CONCENTRATE';
+    warn.textContent=`⚡ Counter disappears at second ${lv.hideAt}`;
+    warn.className='tension-warning';
+    desc.textContent=`seconds · disappears at ${lv.hideAt}s`;
+  }
+  document.getElementById('countdownDisplay').innerHTML='';
+  document.getElementById('readyBtn').style.display='block';
+  showScreen('pregame');
+}
+
+function startCountdown(){
+  document.getElementById('readyBtn').style.display='none';
+  const el=document.getElementById('countdownDisplay');
+  const msgs=['3','2','1','GO!'];let i=0;
+  function next(){
+    if(i>=msgs.length){startGame();return;}
+    el.innerHTML=`<div class="countdown-start">${msgs[i]}</div>`;
+    if(msgs[i]==='GO!') soundGo();
+    else soundBeep(msgs[i]==='1');
+    i++;setTimeout(next,i===msgs.length?400:700);
+  }
+  next();
+}
+
+// GAME
+function startGame(){
+  clearTimers();
+  gameActive=true;
+  const lv=LEVELS[currentLevel];
+  const numEl=document.getElementById('counterNum');
+  const ring=document.getElementById('counterRing');
+  const msg=document.getElementById('mentalMsg');
+  const tapBtn=document.getElementById('tapBtn');
+
+  document.getElementById('gameLevelBadge').textContent=`LEVEL ${lv.id}`;
+  document.getElementById('gameTarget').textContent=lv.target;
+
+  // Reset
+  ring.className='counter-ring visible';
+  numEl.style.opacity='1';
+  numEl.textContent='';
+  msg.style.display='none';
+  tapBtn.className='tap-btn disabled';
+
+  showScreen('game');
+  gameStartMs=performance.now();
+  let elapsed=0;
+
+  if(lv.hideAt===0){
+    ring.className='counter-ring hidden-count';
+    msg.style.display='block';
+    tapBtn.className='tap-btn';
+  }
+
+  gameTimer=setInterval(()=>{
+    elapsed++;
+    if(lv.hideAt>0){
+      if(elapsed<=lv.hideAt){
+        numEl.textContent=elapsed;
+        numEl.classList.remove('tick');void numEl.offsetWidth;numEl.classList.add('tick');
+        soundTick();
+      }
+      if(elapsed===lv.hideAt){
+        soundWhoosh();
+        ring.className='counter-ring hidden-count';
+        numEl.style.opacity='0';
+        setTimeout(()=>{numEl.textContent='';numEl.style.opacity='1';},300);
+        msg.style.display='block';
+        tapBtn.className='tap-btn';
+      }
+    }
+    if(elapsed>lv.target*2){
+      clearInterval(gameTimer);
+      if(gameActive) processResult((elapsed-lv.target)*1000);
+    }
+  },1000);
+}
+
+function handleTap(e){
+  if(!gameActive)return;
+  gameActive=false;
+  clearInterval(gameTimer);
+  soundTap();
+  const devMs=(performance.now()-gameStartMs)-(LEVELS[currentLevel].target*1000);
+  // Ripple
+  const btn=document.getElementById('tapBtn');
+  const r=document.createElement('div');
+  const sz=Math.max(btn.clientWidth,btn.clientHeight);
+  const rect=btn.getBoundingClientRect();
+  const cx=(e.clientX||rect.left+rect.width/2)-rect.left;
+  const cy=(e.clientY||rect.top+rect.height/2)-rect.top;
+  r.style.cssText=`width:${sz}px;height:${sz}px;left:${cx-sz/2}px;top:${cy-sz/2}px`;
+  r.className='ripple';btn.appendChild(r);setTimeout(()=>r.remove(),600);
+  setTimeout(()=>processResult(devMs),300);
+}
+
+function processResult(devMs){
+  const lv=LEVELS[currentLevel];
+  const pts=calcPts(devMs);
+  const passed=pts>=MIN_PASS;
+  const tapMs=lv.target*1000+devMs; // tiempo exacto en ms desde inicio
+  const tapSec=Math.floor(tapMs/1000);
+  const tapMillis=Math.round(Math.abs(tapMs%1000));
+  const tapTimeStr=`${tapSec}.${String(tapMillis).padStart(3,'0').slice(0,2)}s`;
+  const devSec=(devMs>=0?'+':'-')+Math.abs(devMs/1000).toFixed(2)+'s';
+  const pct=getLevelPct(pts,lv.id);
+
+  const d=load();
+  if(!d.levelBests)d.levelBests={};
+  // Solo guardar si es mejor que el récord anterior
+  if(d.levelBests[lv.id]===undefined||pts>d.levelBests[lv.id]) d.levelBests[lv.id]=pts;
+  if(passed){
+    const cur=d.unlockedLevel||1;
+    if(lv.id>=cur) d.unlockedLevel=lv.id+1;
+  }
+  sessionScores[currentLevel]={level:lv.id,points:pts,deviation:devMs};
+  save(d);
+
+  const emojis=['😬','😐','🙂','😊','🎯','⚡','🔥','💫','🧠','🏆'];
+  document.getElementById('resultEmoji').textContent=emojis[Math.min(Math.floor(pts/10),9)];
+  document.getElementById('resultTitle').textContent=pts>=90?'PERFECT!':pts>=75?'GREAT!':pts>=60?'GOOD!':pts>=50?'PASSED!':'KEEP TRAINING';
+  document.getElementById('resultSubtitle').textContent=`Level ${lv.id} · ${lv.target} seconds`;
+  document.getElementById('scorePoints').textContent=pts;
+  document.getElementById('scoreTapTime').textContent=tapTimeStr;
+  document.getElementById('scoreDeviation').textContent=devSec;
+  document.getElementById('resultPercentile').textContent=pct+'%';
+
+  const pf=document.getElementById('passFail');
+  pf.textContent=passed?'✓ LEVEL PASSED':'✗ NEED 50+ POINTS TO ADVANCE';
+  pf.className=`pass-fail ${passed?'pass':'fail'}`;
+
+  const nb=document.getElementById('nextLevelBtn');
+  if(passed&&lv.id<10){
+    nb.textContent='NEXT LEVEL →';nb.style.display='block';
+    soundUnlock();
+  } else if(passed&&lv.id===10){
+    nb.textContent='🏆 FINAL RESULTS';nb.style.display='block';
+    soundUnlock();
+  } else{ nb.style.display='none'; }
+
+  setTimeout(()=>soundForResult(pts), 200);
+  showScreen('result');
+}
+
+function goNextLevel(){
+  const lv=LEVELS[currentLevel];
+  if(lv.id===10){showFinalResults();return;}
+  const next=currentLevel+1;
+  if(next<LEVELS.length)startPreGame(next);
+  else showFinalResults();
+}
+
+function showFinalResults(){
+  const total=sessionScores.reduce((s,r)=>s+(r?r.points:0),0);
+  const played=sessionScores.filter(Boolean).length;
+  const avg=played?Math.round(total/played):0;
+  const topPct=getTopText(total);
+  document.getElementById('finalPts').textContent=total;
+  document.getElementById('finalAvg').textContent=avg;
+  document.getElementById('finalPercentile').textContent=topPct;
+  const list=document.getElementById('breakdownList');list.innerHTML='';
+  LEVELS.forEach((lv,i)=>{
+    const r=sessionScores[i];if(!r)return;
+    const lvPct=getLevelPct(r.points,lv.id);
+    const cls=r.points>=80?'great':r.points>=50?'ok':'poor';
+    list.innerHTML+=`<div class="breakdown-row"><div class="lv">LVL ${lv.id} · ${lv.target}s</div><div class="sc ${cls}">${r.points} pts</div><div class="dev">top ${100-lvPct}%</div></div>`;
+  });
+  endSession();
+  // Envío ya gestionado por endSession, pero forzar si es final completo
+  if(total>=MIN_RANKING) submitToRanking(total);
+  showScreen('finalResult');
+  setTimeout(soundFanfare, 300);
+}
+
+// WIRE UP
+document.getElementById('btnPlay').addEventListener('click',()=>{soundClick();showLevelSelect();});
+document.getElementById('btnStatsHome').addEventListener('click',()=>{soundClick();showStats();});
+document.getElementById('btnHiddenSkill').addEventListener('click',()=>{soundClick();showScreen('hiddenSkill');});
+document.getElementById('btnHiddenSkillBack').addEventListener('click',()=>{soundClick();showScreen('splash');});
+document.getElementById('btnStatsBack').addEventListener('click',()=>{soundClick();initSplash();showScreen('splash');});
+
+// Username
+document.getElementById('usernameEditBtn').addEventListener('click',startEditUsername);
+document.getElementById('usernameDisplay').addEventListener('click',startEditUsername);
+document.getElementById('usernameInput').addEventListener('keydown',(e)=>{
+  if(e.key==='Enter'){e.preventDefault();saveUsername();}
+  if(e.key==='Escape'){initUsername();}
+});
+document.getElementById('usernameInput').addEventListener('blur',saveUsername);
+// Country
+document.getElementById('countryBtn').addEventListener('click',openCountryModal);
+document.getElementById('countryModalClose').addEventListener('click',closeCountryModal);
+document.getElementById('countrySearch').addEventListener('input',(e)=>renderCountryList(e.target.value));
+document.getElementById('btnLevelHome').addEventListener('click',()=>{soundClick();goHome();});
+document.getElementById('readyBtn').addEventListener('click',startCountdown);
+document.getElementById('tapBtn').addEventListener('click',handleTap);
+document.getElementById('nextLevelBtn').addEventListener('click',()=>{soundClick();goNextLevel();});
+document.getElementById('retryBtn').addEventListener('click',()=>{soundClick();startPreGame(currentLevel);});
+document.getElementById('allLevelsBtn').addEventListener('click',()=>{soundClick();endSession();sessionScores=[];showLevelSelect();});
+document.getElementById('resultHomeBtn').addEventListener('click',()=>{soundClick();goHome();});
+document.getElementById('shareFinalBtn').addEventListener('click',()=>{
+  const d=load();
+  const total=sessionScores.reduce((s,r)=>s+(r?r.points:0),0);
+  const topPct=getTopText(total);
+  doShare(d,{total,date:Date.now(),levelsPlayed:sessionScores.filter(Boolean).length},topPct);
+});
+document.getElementById('playAgainBtn').addEventListener('click',()=>{soundClick();sessionScores=[];showLevelSelect();});
+document.getElementById('finalHomeBtn').addEventListener('click',()=>{soundClick();sessionScores=[];initSplash();showScreen('splash');});
+
+initSplash();showScreen('splash');
+</script>
+</body>
+</html>
