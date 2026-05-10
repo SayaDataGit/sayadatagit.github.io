@@ -441,8 +441,8 @@
     <div class="final-avg">Average per level: <span id="finalAvg">0</span> pts</div>
   </div>
   <div class="percentile-box">
-    <div class="percentile-label">YOU'RE IN THE</div>
-    <div class="percentile-val" id="finalPercentile">TOP 15%</div>
+    <div class="percentile-label">YOUR GLOBAL SCORE</div>
+    <div class="percentile-val" id="finalPercentile">BETTER THAN 50%</div>
     <div class="percentile-text">of all SecondSense Tap players</div>
   </div>
   <div class="breakdown">
@@ -659,22 +659,10 @@ function getGlobalPct(total){
   return gaussCDF(total, GLOBAL_MU, GLOBAL_SIGMA);
 }
 
-// Texto TOP para la pantalla de estadísticas
+// Texto percentil global exacto
 function getTopText(total){
   const p=getGlobalPct(total);
-  if(p>=99)return'TOP 1%';
-  if(p>=97)return'TOP 3%';
-  if(p>=95)return'TOP 5%';
-  if(p>=90)return'TOP 10%';
-  if(p>=85)return'TOP 15%';
-  if(p>=80)return'TOP 20%';
-  if(p>=75)return'TOP 25%';
-  if(p>=70)return'TOP 30%';
-  if(p>=60)return'TOP 40%';
-  if(p>=50)return'TOP 50%';
-  if(p>=40)return'TOP 60%';
-  if(p>=25)return'TOP 75%';
-  return'TOP 80%+';
+  return `BETTER THAN ${p}%`;
 }
 
 function fmtDate(ts){const d=new Date(ts);return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'});}
@@ -947,7 +935,7 @@ function showStats(){
 
   // 2. Percentil
   const pb=document.createElement('div');pb.className='percentile-box';
-  pb.innerHTML=`<div class="percentile-label">YOUR BEST — YOU'RE IN THE</div><div class="percentile-val">${topPct}</div><div class="percentile-text">of all SecondSense Tap players</div>`;
+  pb.innerHTML=`<div class="percentile-label">YOUR GLOBAL SCORE</div><div class="percentile-val">${topPct}</div><div class="percentile-text">of all SecondSense Tap players</div>`;
   c.appendChild(pb);
 
   // 3. Best session
@@ -1095,11 +1083,11 @@ function doShare(d,bestSession,topPct){
 
     // Percentil
     ctx.font='bold 12px monospace';ctx.fillStyle='rgba(112,112,170,0.8)';ctx.letterSpacing='3px';
-    ctx.fillText("YOU'RE IN THE",W/2,134);
+    ctx.fillText("YOUR GLOBAL SCORE",W/2,134);
     const pg=ctx.createLinearGradient(100,140,W-100,210);
     pg.addColorStop(0,'#ff2d78');pg.addColorStop(1,'#ff7b2f');
-    ctx.fillStyle=pg;ctx.font='bold 68px monospace';ctx.letterSpacing='1px';
-    ctx.fillText(topPct,W/2,215);
+    ctx.fillStyle=pg;ctx.font='bold 44px monospace';ctx.letterSpacing='1px';
+    ctx.fillText(topPct,W/2,210);
     ctx.font='12px monospace';ctx.fillStyle='rgba(232,232,255,0.6)';ctx.letterSpacing='1px';
     ctx.fillText('of all SecondSense Tap players',W/2,247);
     line(267);
