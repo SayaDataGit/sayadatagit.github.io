@@ -3,6 +3,6 @@
   "target": {
     "namespace": "android_app",
     "package_name": "com.cognition.secondsensetap",
-    "sha256_cert_fingerprints": ["FE:80:67:72:2A:40:B0:40:5D:D4:AD:39:1C:96:09:9E:67:E0:E9:75:98:3A:99:79:D1:1F:CD:5F:F6:3B:23:5E"]
+    "sha256_cert_fingerprints": ["08:26:DB:E1:3A:B9:C5:E0:87:F0:DF:3C:82:49:3A:51:08:16:70:EF:CC:79:AD:85:A9:B5:DA:A9:10:82:41:14"]
   }
 }]
