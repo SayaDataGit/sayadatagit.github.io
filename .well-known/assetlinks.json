@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.cognition.secondsensetap",
+    "sha256_cert_fingerprints": ["FE:80:67:72:2A:40:B0:40:5D:D4:AD:39:1C:96:09:9E:67:E0:E9:75:98:3A:99:79:D1:1F:CD:5F:F6:3B:23:5E"]
+  }
+}]
